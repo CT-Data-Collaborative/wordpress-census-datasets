@@ -1,0 +1,104 @@
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ckan/0.2.3/ckan.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css">
+
+<script>
+var ckanUrl = 'http://data.ctdata.org';
+var ckan = new CKAN.Client(ckanUrl);
+
+ckan.action('package_search', {
+  q: ['US Census'],
+  rows: 1000,
+}, function(err, res) {
+
+  if (!err) {
+    var datasets = res.result.results;
+
+    for (var i = 0; i < datasets.length; i++) {
+      var d = datasets[i];
+      var name = d.name;
+      var niceName = name.split('-').join(' ');
+
+      var domain = '';
+
+      for (var j = 0; j < d.extras.length; j++) {
+        if (d.extras[j].key == 'Domain') {
+          domain = d.extras[j].value;
+          break;
+        }
+      }
+
+      if (!domain) continue;
+
+
+      $('#' + domain).append('<li><a href="' + ckanUrl + '/visualization/' + name + '" target="_blank">' + niceName + '</a></li>');
+    }
+
+  }
+
+});
+
+</script>
+
+
+
+
+<div id="census-datasets">
+
+<ul id="Demographics">
+  <li><i class="fa fa-female"></i><i class="fa fa-male"></i> Demographics</li>
+</ul>
+<ul id="Economy">
+  <li><i class="fa fa-line-chart"></i> Economy</li>
+</ul>
+<ul id="Housing">
+  <li><i class="fa fa-home"></i> Housing</li>
+</ul>
+<ul id="Health">
+  <li><i class="fa fa-medkit"></i> Health</li>
+</ul>
+
+<div class="clear"></div>
+
+</div>
+
+<style>
+#census-datasets {
+  background-color: #002147 !important;
+  color: white;
+  font-family: Arial;
+  padding-bottom: 40px;
+}
+#census-datasets ul {
+  width: 100%;
+  text-transform: capitalize;
+  margin: 40px 2% 0 2%;
+  padding: 0;
+  list-style-type: none;
+  width: 21%;
+  float: left;
+  font-size: 0.9em;
+  min-width: 350px;
+  line-height: 1.3em;
+}
+
+#census-datasets ul li:first-child {
+  font-size: 1.3em;
+  margin-bottom: 10px;
+}
+
+#census-datasets a, #census-datasets a:hover, #census-datasets a:visited {
+  color: white;
+  text-decoration: none;
+  opacity: 0.8;
+}
+
+#census-datasets a:hover {
+  opacity: 0.9;
+}
+
+div.clear {
+  clear: both;
+  font-size: 0;
+}
+</style>

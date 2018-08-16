@@ -19,6 +19,7 @@ ckan.action('package_search', {
 
       var domain = '';
       var subdomain = '';
+      var source = '';
 
       for (var j = 0; j < d.extras.length; j++) {
         if (d.extras[j].key == 'Domain') {
@@ -27,7 +28,12 @@ ckan.action('package_search', {
         if (d.extras[j].key == 'Subdomain') {
           subdomain = d.extras[j].value.replace(' ', '');
         }
+        if (d.extras[j].key == 'Source') {
+          source = d.extras[j].value;
+        }
       }
+
+      if (source != 'US Census') continue;
 
       if (!domain || !subdomain) continue;
 

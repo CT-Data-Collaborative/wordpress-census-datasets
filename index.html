@@ -1,6 +1,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ckan/0.2.3/ckan.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css">
+<!-- <script src="https://cdn.rawgit.com/CT-Data-Collaborative/wordpress-census-datasets/c35a25c8/script.js"></script> -->
+
 
 <script>
 var ckanUrl = 'http://data.ctdata.org';
@@ -14,24 +16,34 @@ ckan.action('package_search', {
   if (!err) {
     var datasets = res.result.results;
 
+    // Sort datasets alphabetically
+    datasets.sort(function(a, b) { return ('' + b.title).localeCompare(a.title) } );  // sort in reverse alphabetical order
+
     for (var i = 0; i < datasets.length; i++) {
       var d = datasets[i];
       var name = d.name;
-      var niceName = name.split('-').join(' ');
+      var title = d.title;
 
       var domain = '';
+      var subdomain = '';
 
       for (var j = 0; j < d.extras.length; j++) {
         if (d.extras[j].key == 'Domain') {
           domain = d.extras[j].value;
-          break;
+        }
+        if (d.extras[j].key == 'Subdomain') {
+          subdomain = d.extras[j].value.replace(' ', '');
         }
       }
 
-      if (!domain) continue;
+      if (!domain || !subdomain) continue;
 
+      var elem = (domain == 'Health' || domain == 'Education')
+        ?  '#' + domain + ' li:first-child'
+        :  '#' + subdomain;
 
-      $('#' + domain).append('<li><a href="' + ckanUrl + '/visualization/' + name + '" target="_blank">' + niceName + '</a></li>');
+      $(elem).after('<li><a href="' + ckanUrl + '/visualization/' + name + '" target="_blank">' + title + '</a></li>');
+
     }
 
   }
@@ -42,24 +54,33 @@ ckan.action('package_search', {
 
 
 
-
 <div id="census-datasets">
+  <ul id="Economy">
+    <li><i class="fa fa-line-chart"></i> Economy</li>
+    <li id="Employment" class="submenu"> Employment</li>
+    <li id="Income" class="submenu"> Income</li>
+    <li id="SocialAssistance" class="submenu"> Social Assistance </li>
+    <li id="Poverty" class="submenu"> Poverty </li>
+  </ul>
+  <ul id="Housing">
+    <li><i class="fa fa-home"></i> Housing</li>
+    <li id="HousingCharacteristics" class="submenu"> Housing Characteristics</li>
+    <li id="HouseholdCharacteristics" class="submenu"> Household Characteristics</li>
+  </ul>
 
-<ul id="Demographics">
-  <li><i class="fa fa-female"></i><i class="fa fa-male"></i> Demographics</li>
-</ul>
-<ul id="Economy">
-  <li><i class="fa fa-line-chart"></i> Economy</li>
-</ul>
-<ul id="Housing">
-  <li><i class="fa fa-home"></i> Housing</li>
-</ul>
-<ul id="Health">
-  <li><i class="fa fa-medkit"></i> Health</li>
-</ul>
+  <ul id="Demographics">
+    <li><i class="fa fa-female"></i><i class="fa fa-male"></i> Demographics</li>
+    <li id="Population" class="submenu"> Population</li>
+    <li id="FamilyStructure" class="submenu"> Family Structure</li>
+  </ul>
+  <ul id="Education">
+    <li><i class="fa fa-graduation-cap"></i> Education</li>
+  </ul>
+  <ul id="Health">
+    <li><i class="fa fa-medkit"></i> Health</li>
+  </ul>
 
-<div class="clear"></div>
-
+  <div class="clear"></div>
 </div>
 
 <style>
@@ -78,23 +99,30 @@ ckan.action('package_search', {
   width: 21%;
   float: left;
   font-size: 0.9em;
-  min-width: 350px;
+  min-width: 330px;
   line-height: 1.3em;
 }
 
 #census-datasets ul li:first-child {
-  font-size: 1.3em;
+  font-size: 1.6em;
   margin-bottom: 10px;
 }
 
 #census-datasets a, #census-datasets a:hover, #census-datasets a:visited {
   color: white;
   text-decoration: none;
+  opacity: 0.6;
+  padding-left: 5px;
+}
+
+#census-datasets .submenu {
+  font-size: 1.2em;
+  margin: 10px 0 4px 0;
   opacity: 0.8;
 }
 
 #census-datasets a:hover {
-  opacity: 0.9;
+  opacity: 0.8;
 }
 
 div.clear {

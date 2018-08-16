@@ -9,24 +9,34 @@ ckan.action('package_search', {
   if (!err) {
     var datasets = res.result.results;
 
+    // Sort datasets alphabetically
+    datasets.sort(function(a, b) { return ('' + b.title).localeCompare(a.title) } );  // sort in reverse alphabetical order
+
     for (var i = 0; i < datasets.length; i++) {
       var d = datasets[i];
       var name = d.name;
-      var niceName = name.split('-').join(' ');
+      var title = d.title;
 
       var domain = '';
+      var subdomain = '';
 
       for (var j = 0; j < d.extras.length; j++) {
         if (d.extras[j].key == 'Domain') {
           domain = d.extras[j].value;
-          break;
+        }
+        if (d.extras[j].key == 'Subdomain') {
+          subdomain = d.extras[j].value.replace(' ', '');
         }
       }
 
-      if (!domain) continue;
+      if (!domain || !subdomain) continue;
 
+      var elem = (domain == 'Health' || domain == 'Education')
+        ?  '#' + domain + ' li:first-child'
+        :  '#' + subdomain;
 
-      $('#' + domain).append('<li><a href="' + ckanUrl + '/visualization/' + name + '" target="_blank">' + niceName + '</a></li>');
+      $(elem).after('<li><a href="' + ckanUrl + '/visualization/' + name + '" target="_blank">' + title + '</a></li>');
+
     }
 
   }
